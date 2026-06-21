@@ -1,0 +1,93 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum JobStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+}
+
+// One-off assignments: paid in full after delivery.
+model Assignment {
+  id              String    @id @default(cuid())
+  clientName      String
+  whatsappNumber  String
+  topic           String
+  amountCharged   Float
+  isPaid          Boolean   @default(false)
+  paidAt          DateTime?
+  deadline        DateTime
+  status          JobStatus @default(PENDING)
+  notes           String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+}
+
+// Research projects: deposit at start, balance at completion, can run for months.
+model ResearchProject {
+  id              String    @id @default(cuid())
+  clientName      String
+  whatsappNumber  String
+  topic           String
+  amountCharged   Float
+  depositAmount   Float
+  depositPaid     Boolean   @default(false)
+  depositPaidAt   DateTime?
+  balanceAmount   Float
+  balancePaid     Boolean   @default(false)
+  balancePaidAt   DateTime?
+  deadline        DateTime?
+  status          JobStatus @default(PENDING)
+  notes           String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+}
+
+// Patient/family centered care studies: deposit at start, balance at completion.
+model CareStudy {
+  id              String    @id @default(cuid())
+  clientName      String
+  whatsappNumber  String
+  condition       String
+  amountCharged   Float
+  depositAmount   Float
+  depositPaid     Boolean   @default(false)
+  depositPaidAt   DateTime?
+  balanceAmount   Float
+  balancePaid     Boolean   @default(false)
+  balancePaidAt   DateTime?
+  deadline        DateTime?
+  status          JobStatus @default(PENDING)
+  notes           String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+}
+
+// App/software builds: deposit at start, balance at completion.
+model CodingProject {
+  id              String    @id @default(cuid())
+  clientName      String
+  whatsappNumber  String
+  projectName     String
+  amountCharged   Float
+  depositAmount   Float
+  depositPaid     Boolean   @default(false)
+  depositPaidAt   DateTime?
+  balanceAmount   Float
+  balancePaid     Boolean   @default(false)
+  balancePaidAt   DateTime?
+  deadline        DateTime?
+  status          JobStatus @default(PENDING)
+  notes           String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+}

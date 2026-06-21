@@ -1,65 +1,166 @@
-import Image from "next/image";
+import Link from "next/link";
+import { prisma } from "@/app/lib/prisma";
+import { formatDate, formatMoney, isOverdue } from "@/app/lib/format";
+import { waLink } from "@/app/lib/whatsapp";
+import { StatusBadge } from "@/app/components/StatusBadge";
 
-export default function Home() {
+export const dynamic = "force-dynamic";
+
+type JobRow = {
+  id: string;
+  type: string;
+  typeLabel: string;
+  title: string;
+  clientName: string;
+  whatsappNumber: string;
+  deadline: Date | null;
+  status: string;
+  outstanding: number;
+  editPath: string;
+};
+
+export default async function DashboardPage() {
+  const [assignments, research, careStudies, coding] = await Promise.all([
+    prisma.assignment.findMany(),
+    prisma.researchProject.findMany(),
+    prisma.careStudy.findMany(),
+    prisma.codingProject.findMany(),
+  ]);
+
+  const rows: JobRow[] = [
+    ...assignments.map((a) => ({
+      id: a.id,
+      type: "assignment",
+      typeLabel: "Assignment",
+      title: a.topic,
+      clientName: a.clientName,
+      whatsappNumber: a.whatsappNumber,
+      deadline: a.deadline,
+      status: a.status,
+      outstanding: a.isPaid ? 0 : a.amountCharged,
+      editPath: `/assignments/${a.id}`,
+    })),
+    ...research.map((r) => ({
+      id: r.id,
+      type: "research",
+      typeLabel: "Research",
+      title: r.topic,
+      clientName: r.clientName,
+      whatsappNumber: r.whatsappNumber,
+      deadline: r.deadline,
+      status: r.status,
+      outstanding: (r.depositPaid ? 0 : r.depositAmount) + (r.balancePaid ? 0 : r.balanceAmount),
+      editPath: `/research/${r.id}`,
+    })),
+    ...careStudies.map((c) => ({
+      id: c.id,
+      type: "care-study",
+      typeLabel: "Care Study",
+      title: c.condition,
+      clientName: c.clientName,
+      whatsappNumber: c.whatsappNumber,
+      deadline: c.deadline,
+      status: c.status,
+      outstanding: (c.depositPaid ? 0 : c.depositAmount) + (c.balancePaid ? 0 : c.balanceAmount),
+      editPath: `/care-studies/${c.id}`,
+    })),
+    ...coding.map((p) => ({
+      id: p.id,
+      type: "coding",
+      typeLabel: "Coding",
+      title: p.projectName,
+      clientName: p.clientName,
+      whatsappNumber: p.whatsappNumber,
+      deadline: p.deadline,
+      status: p.status,
+      outstanding: (p.depositPaid ? 0 : p.depositAmount) + (p.balancePaid ? 0 : p.balanceAmount),
+      editPath: `/coding/${p.id}`,
+    })),
+  ];
+
+  rows.sort((a, b) => {
+    if (!a.deadline) return 1;
+    if (!b.deadline) return -1;
+    return new Date(a.deadline).getTime() - new Date(b.deadline).getTime();
+  });
+
+  const activeRows = rows.filter((r) => r.status !== "COMPLETED");
+  const overdueCount = activeRows.filter((r) => isOverdue(r.deadline, r.status)).length;
+  const outstandingTotal = rows.reduce((sum, r) => sum + r.outstanding, 0);
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+    <div className="space-y-6">
+      <h1 className="text-xl font-semibold text-gray-900">Dashboard</h1>
+
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+        <SummaryCard label="Active jobs" value={String(activeRows.length)} />
+        <SummaryCard label="Overdue" value={String(overdueCount)} highlight={overdueCount > 0} />
+        <SummaryCard label="Outstanding payments" value={formatMoney(outstandingTotal)} />
+      </div>
+
+      <div className="space-y-3">
+        {rows.length === 0 && <p className="text-sm text-gray-500">No jobs tracked yet.</p>}
+        {rows.map((row) => (
+          <div
+            key={`${row.type}-${row.id}`}
+            className={`rounded-lg border bg-white p-4 ${
+              isOverdue(row.deadline, row.status) ? "border-red-300" : "border-gray-200"
+            }`}
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
+            <div className="flex flex-wrap items-start justify-between gap-2">
+              <div>
+                <span className="mb-1 inline-block rounded bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-600">
+                  {row.typeLabel}
+                </span>
+                <p className="font-medium text-gray-900">{row.title}</p>
+                <p className="text-sm text-gray-500">{row.clientName}</p>
+              </div>
+              <StatusBadge status={row.status} />
+            </div>
+            <div className="mt-3 flex flex-wrap items-center gap-4 text-sm text-gray-600">
+              <span className={isOverdue(row.deadline, row.status) ? "font-medium text-red-600" : ""}>
+                Deadline: {formatDate(row.deadline)}
+                {isOverdue(row.deadline, row.status) ? " (overdue)" : ""}
+              </span>
+              {row.outstanding > 0 && (
+                <span className="font-medium text-amber-700">
+                  Owed: {formatMoney(row.outstanding)}
+                </span>
+              )}
+              <a
+                href={waLink(row.whatsappNumber)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-green-700 hover:underline"
+              >
+                WhatsApp
+              </a>
+              <Link href={row.editPath} className="text-gray-700 hover:underline">
+                Edit
+              </Link>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function SummaryCard({
+  label,
+  value,
+  highlight,
+}: {
+  label: string;
+  value: string;
+  highlight?: boolean;
+}) {
+  return (
+    <div className="rounded-lg border border-gray-200 bg-white p-4">
+      <p className="text-sm text-gray-500">{label}</p>
+      <p className={`text-2xl font-semibold ${highlight ? "text-red-600" : "text-gray-900"}`}>
+        {value}
+      </p>
     </div>
   );
 }

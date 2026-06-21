@@ -1,36 +1,42 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+## Project Tracker
 
-## Getting Started
+A personal tracker for assignments, research projects, patient/family centered care studies, and coding projects — deadlines, payments owed, and client WhatsApp contacts in one place.
 
-First, run the development server:
+### Setup
+
+1. Install dependencies:
+
+```bash
+npm install
+```
+
+2. Set your database connection string in `.env` (copy `.env.example`):
+
+```bash
+DATABASE_URL="postgresql://user:password@host/dbname?sslmode=require"
+```
+
+Use your Neon connection string here (the pooled one ending in `-pooler` works fine).
+
+3. Apply the database schema:
+
+```bash
+npx prisma migrate deploy
+```
+
+4. Run the app:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Data model
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Each work type is its own table since they're priced and paid differently:
 
-## Learn More
+- **Assignments** — single price, paid in full after delivery.
+- **Research projects**, **Care studies**, **Coding projects** — total price split into a deposit (paid at start) and balance (paid on completion).
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Every job stores the client's name, WhatsApp number (with a click-to-chat button), a topic/condition/project name, a deadline, and a status. The dashboard lists everything together, sorted by deadline, and flags overdue and unpaid items.
