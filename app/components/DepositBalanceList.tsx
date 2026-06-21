@@ -35,37 +35,39 @@ export function DepositBalanceList<T extends DepositBalanceItem>({
   emptyLabel: string;
 }) {
   if (items.length === 0) {
-    return <p className="text-sm text-gray-500">{emptyLabel}</p>;
+    return <p className="card p-6 text-center text-sm text-slate-500">{emptyLabel}</p>;
   }
 
   return (
     <div className="space-y-3">
-      {items.map((item) => (
+      {items.map((item) => {
+        const overdue = isOverdue(item.deadline, item.status);
+        return (
         <div
           key={item.id}
-          className={`rounded-lg border bg-white p-4 ${
-            isOverdue(item.deadline, item.status) ? "border-red-300" : "border-gray-200"
+          className={`card border-l-4 p-4 transition hover:shadow-md ${
+            overdue ? "border-l-rose-500 ring-1 ring-rose-200" : "border-l-violet-500"
           }`}
         >
           <div className="flex flex-wrap items-start justify-between gap-2">
             <div>
-              <p className="font-medium text-gray-900">{name(item)}</p>
-              <p className="text-sm text-gray-500">{item.clientName}</p>
+              <p className="font-semibold text-slate-900">{name(item)}</p>
+              <p className="text-sm text-slate-500">{item.clientName}</p>
             </div>
             <StatusBadge status={item.status} />
           </div>
 
-          <div className="mt-3 flex flex-wrap items-center gap-4 text-sm text-gray-600">
-            <span className={isOverdue(item.deadline, item.status) ? "font-medium text-red-600" : ""}>
+          <div className="mt-3 flex flex-wrap items-center gap-4 text-sm text-slate-600">
+            <span className={overdue ? "font-semibold text-rose-600" : ""}>
               Deadline: {formatDate(item.deadline)}
-              {isOverdue(item.deadline, item.status) ? " (overdue)" : ""}
+              {overdue ? " (overdue)" : ""}
             </span>
             <span>Total: {formatMoney(item.amountCharged)}</span>
             <a
               href={waLink(item.whatsappNumber)}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-green-700 hover:underline"
+              className="font-medium text-emerald-600 hover:underline"
             >
               WhatsApp
             </a>
@@ -101,7 +103,8 @@ export function DepositBalanceList<T extends DepositBalanceItem>({
             </form>
           </div>
         </div>
-      ))}
+        );
+      })}
     </div>
   );
 }

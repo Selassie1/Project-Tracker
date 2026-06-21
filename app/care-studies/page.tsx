@@ -11,7 +11,7 @@ export default async function CareStudiesPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-xl font-semibold text-gray-900">Care studies</h1>
+        <h1 className="text-2xl font-bold text-slate-900">Care studies</h1>
         <Link href="/care-studies/new" className="btn-primary">
           + New care study
         </Link>

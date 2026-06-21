@@ -11,7 +11,7 @@ export default async function ResearchPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-xl font-semibold text-gray-900">Research projects</h1>
+        <h1 className="text-2xl font-bold text-slate-900">Research projects</h1>
         <Link href="/research/new" className="btn-primary">
           + New research project
         </Link>

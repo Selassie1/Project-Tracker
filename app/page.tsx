@@ -19,6 +19,13 @@ type JobRow = {
   editPath: string;
 };
 
+const TYPE_STYLES: Record<string, { bar: string; badge: string }> = {
+  assignment: { bar: "border-l-violet-500", badge: "bg-violet-100 text-violet-700" },
+  research: { bar: "border-l-sky-500", badge: "bg-sky-100 text-sky-700" },
+  "care-study": { bar: "border-l-rose-500", badge: "bg-rose-100 text-rose-700" },
+  coding: { bar: "border-l-amber-500", badge: "bg-amber-100 text-amber-700" },
+};
+
 export default async function DashboardPage() {
   const [assignments, research, careStudies, coding] = await Promise.all([
     prisma.assignment.findMany(),
@@ -90,57 +97,80 @@ export default async function DashboardPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-xl font-semibold text-gray-900">Dashboard</h1>
+      <div>
+        <h1 className="text-2xl font-bold text-slate-900">Dashboard</h1>
+        <p className="text-sm text-slate-500">Everything you&apos;re working on, in one place.</p>
+      </div>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-        <SummaryCard label="Active jobs" value={String(activeRows.length)} />
-        <SummaryCard label="Overdue" value={String(overdueCount)} highlight={overdueCount > 0} />
-        <SummaryCard label="Outstanding payments" value={formatMoney(outstandingTotal)} />
+        <SummaryCard
+          label="Active jobs"
+          value={String(activeRows.length)}
+          gradient="from-violet-500 to-violet-700"
+        />
+        <SummaryCard
+          label="Overdue"
+          value={String(overdueCount)}
+          gradient={overdueCount > 0 ? "from-rose-500 to-rose-700" : "from-emerald-500 to-emerald-700"}
+        />
+        <SummaryCard
+          label="Outstanding payments"
+          value={formatMoney(outstandingTotal)}
+          gradient="from-amber-500 to-amber-600"
+        />
       </div>
 
       <div className="space-y-3">
-        {rows.length === 0 && <p className="text-sm text-gray-500">No jobs tracked yet.</p>}
-        {rows.map((row) => (
-          <div
-            key={`${row.type}-${row.id}`}
-            className={`rounded-lg border bg-white p-4 ${
-              isOverdue(row.deadline, row.status) ? "border-red-300" : "border-gray-200"
-            }`}
-          >
-            <div className="flex flex-wrap items-start justify-between gap-2">
-              <div>
-                <span className="mb-1 inline-block rounded bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-600">
-                  {row.typeLabel}
-                </span>
-                <p className="font-medium text-gray-900">{row.title}</p>
-                <p className="text-sm text-gray-500">{row.clientName}</p>
+        {rows.length === 0 && (
+          <p className="card p-6 text-center text-sm text-slate-500">No jobs tracked yet.</p>
+        )}
+        {rows.map((row) => {
+          const overdue = isOverdue(row.deadline, row.status);
+          const style = TYPE_STYLES[row.type] ?? TYPE_STYLES.assignment;
+          return (
+            <div
+              key={`${row.type}-${row.id}`}
+              className={`card border-l-4 p-4 transition hover:shadow-md ${
+                overdue ? "border-l-rose-500 ring-1 ring-rose-200" : style.bar
+              }`}
+            >
+              <div className="flex flex-wrap items-start justify-between gap-2">
+                <div>
+                  <span
+                    className={`mb-1 inline-block rounded-full px-2.5 py-0.5 text-xs font-semibold ${style.badge}`}
+                  >
+                    {row.typeLabel}
+                  </span>
+                  <p className="font-semibold text-slate-900">{row.title}</p>
+                  <p className="text-sm text-slate-500">{row.clientName}</p>
+                </div>
+                <StatusBadge status={row.status} />
               </div>
-              <StatusBadge status={row.status} />
-            </div>
-            <div className="mt-3 flex flex-wrap items-center gap-4 text-sm text-gray-600">
-              <span className={isOverdue(row.deadline, row.status) ? "font-medium text-red-600" : ""}>
-                Deadline: {formatDate(row.deadline)}
-                {isOverdue(row.deadline, row.status) ? " (overdue)" : ""}
-              </span>
-              {row.outstanding > 0 && (
-                <span className="font-medium text-amber-700">
-                  Owed: {formatMoney(row.outstanding)}
+              <div className="mt-3 flex flex-wrap items-center gap-4 text-sm text-slate-600">
+                <span className={overdue ? "font-semibold text-rose-600" : ""}>
+                  Deadline: {formatDate(row.deadline)}
+                  {overdue ? " (overdue)" : ""}
                 </span>
-              )}
-              <a
-                href={waLink(row.whatsappNumber)}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-green-700 hover:underline"
-              >
-                WhatsApp
-              </a>
-              <Link href={row.editPath} className="text-gray-700 hover:underline">
-                Edit
-              </Link>
+                {row.outstanding > 0 && (
+                  <span className="font-semibold text-amber-600">
+                    Owed: {formatMoney(row.outstanding)}
+                  </span>
+                )}
+                <a
+                  href={waLink(row.whatsappNumber)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-medium text-emerald-600 hover:underline"
+                >
+                  WhatsApp
+                </a>
+                <Link href={row.editPath} className="font-medium text-violet-600 hover:underline">
+                  Edit
+                </Link>
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );
@@ -149,18 +179,16 @@ export default async function DashboardPage() {
 function SummaryCard({
   label,
   value,
-  highlight,
+  gradient,
 }: {
   label: string;
   value: string;
-  highlight?: boolean;
+  gradient: string;
 }) {
   return (
-    <div className="rounded-lg border border-gray-200 bg-white p-4">
-      <p className="text-sm text-gray-500">{label}</p>
-      <p className={`text-2xl font-semibold ${highlight ? "text-red-600" : "text-gray-900"}`}>
-        {value}
-      </p>
+    <div className={`rounded-xl bg-gradient-to-br ${gradient} p-4 text-white shadow-sm`}>
+      <p className="text-sm text-white/80">{label}</p>
+      <p className="text-3xl font-bold">{value}</p>
     </div>
   );
 }
