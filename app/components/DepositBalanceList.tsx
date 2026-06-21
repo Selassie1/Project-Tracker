@@ -3,6 +3,7 @@ import { formatDate, formatMoney, isOverdue } from "@/app/lib/format";
 import { waLink } from "@/app/lib/whatsapp";
 import { StatusBadge } from "./StatusBadge";
 import { PayBadge } from "./PayBadge";
+import { DeleteButton } from "./DeleteButton";
 
 type DepositBalanceItem = {
   id: string;
@@ -35,7 +36,7 @@ export function DepositBalanceList<T extends DepositBalanceItem>({
   emptyLabel: string;
 }) {
   if (items.length === 0) {
-    return <p className="card p-6 text-center text-sm text-slate-500">{emptyLabel}</p>;
+    return <p className="card p-6 text-center text-sm text-slate-400">{emptyLabel}</p>;
   }
 
   return (
@@ -46,19 +47,19 @@ export function DepositBalanceList<T extends DepositBalanceItem>({
         <div
           key={item.id}
           className={`card border-l-4 p-4 transition hover:shadow-md ${
-            overdue ? "border-l-rose-500 ring-1 ring-rose-200" : "border-l-violet-500"
+            overdue ? "border-l-rose-500 ring-1 ring-rose-900/40" : "border-l-violet-500"
           }`}
         >
           <div className="flex flex-wrap items-start justify-between gap-2">
             <div>
-              <p className="font-semibold text-slate-900">{name(item)}</p>
-              <p className="text-sm text-slate-500">{item.clientName}</p>
+              <p className="font-semibold text-white">{name(item)}</p>
+              <p className="text-sm text-slate-400">{item.clientName}</p>
             </div>
             <StatusBadge status={item.status} />
           </div>
 
-          <div className="mt-3 flex flex-wrap items-center gap-4 text-sm text-slate-600">
-            <span className={overdue ? "font-semibold text-rose-600" : ""}>
+          <div className="mt-3 flex flex-wrap items-center gap-4 text-sm text-slate-400">
+            <span className={overdue ? "font-semibold text-rose-400" : ""}>
               Deadline: {formatDate(item.deadline)}
               {overdue ? " (overdue)" : ""}
             </span>
@@ -67,7 +68,7 @@ export function DepositBalanceList<T extends DepositBalanceItem>({
               href={waLink(item.whatsappNumber)}
               target="_blank"
               rel="noopener noreferrer"
-              className="font-medium text-emerald-600 hover:underline"
+              className="font-medium text-emerald-400 hover:underline"
             >
               WhatsApp
             </a>
@@ -97,9 +98,7 @@ export function DepositBalanceList<T extends DepositBalanceItem>({
               Edit
             </Link>
             <form action={onDelete.bind(null, item.id)}>
-              <button type="submit" className="btn-danger">
-                Delete
-              </button>
+              <DeleteButton />
             </form>
           </div>
         </div>
