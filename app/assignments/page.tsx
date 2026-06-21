@@ -5,6 +5,7 @@ import { waLink } from "@/app/lib/whatsapp";
 import { StatusBadge } from "@/app/components/StatusBadge";
 import { PayBadge } from "@/app/components/PayBadge";
 import { DeleteButton } from "@/app/components/DeleteButton";
+import { SubmitButton } from "@/app/components/SubmitButton";
 import { deleteAssignment, togglePaid } from "./actions";
 
 export const dynamic = "force-dynamic";
@@ -61,9 +62,7 @@ export default async function AssignmentsPage() {
 
             <div className="mt-3 flex gap-2">
               <form action={togglePaid.bind(null, a.id, !a.isPaid)}>
-                <button type="submit" className="btn-secondary">
-                  Mark {a.isPaid ? "unpaid" : "paid"}
-                </button>
+                <SubmitButton>Mark {a.isPaid ? "unpaid" : "paid"}</SubmitButton>
               </form>
               <Link href={`/assignments/${a.id}`} className="btn-secondary">
                 Edit
