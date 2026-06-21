@@ -14,7 +14,7 @@ export default async function EditCodingProjectPage({
 
   return (
     <div className="space-y-6">
-      <h1 className="text-xl font-semibold text-gray-900">Edit coding project</h1>
+      <h1 className="text-2xl font-bold text-slate-900">Edit coding project</h1>
       <DepositBalanceForm
         action={updateCodingProject.bind(null, id)}
         nameField="projectName"

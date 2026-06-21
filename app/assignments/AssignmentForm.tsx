@@ -18,7 +18,7 @@ export function AssignmentForm({
   const deadlineValue = initial ? new Date(initial.deadline).toISOString().slice(0, 10) : "";
 
   return (
-    <form action={action} className="space-y-4 rounded-lg border border-gray-200 bg-white p-6">
+    <form action={action} className="card space-y-4 p-6">
       <div className="grid gap-4 sm:grid-cols-2">
         <Field label="Client name">
           <input name="clientName" required defaultValue={initial?.clientName} className="input" />
@@ -78,7 +78,7 @@ export function AssignmentForm({
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <label className="block">
-      <span className="mb-1 block text-sm font-medium text-gray-700">{label}</span>
+      <span className="mb-1 block text-sm font-medium text-slate-700">{label}</span>
       {children}
     </label>
   );

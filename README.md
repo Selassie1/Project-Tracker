@@ -40,3 +40,11 @@ Each work type is its own table since they're priced and paid differently:
 - **Research projects**, **Care studies**, **Coding projects** — total price split into a deposit (paid at start) and balance (paid on completion).
 
 Every job stores the client's name, WhatsApp number (with a click-to-chat button), a topic/condition/project name, a deadline, and a status. The dashboard lists everything together, sorted by deadline, and flags overdue and unpaid items.
+
+### Deploying to Vercel
+
+Set `DATABASE_URL` in the Vercel project's environment variables (use the Neon pooled connection string). The build only runs `prisma generate` — it does not run migrations, since Vercel's build sandbox can't reliably reach the database. After pushing a schema change, apply it manually from your machine before (or right after) deploying:
+
+```bash
+npx prisma migrate deploy
+```
