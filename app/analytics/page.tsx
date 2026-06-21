@@ -80,9 +80,14 @@ export default async function AnalyticsPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-white">Analytics</h1>
-        <p className="text-sm text-slate-400">How the business is doing across every job type.</p>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h1 className="text-2xl font-bold text-white">Analytics</h1>
+          <p className="text-sm text-slate-400">How the business is doing across every job type.</p>
+        </div>
+        <a href="/api/export" className="btn-secondary">
+          Export CSV
+        </a>
       </div>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">

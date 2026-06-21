@@ -48,3 +48,7 @@ Set `DATABASE_URL` in the Vercel project's environment variables (use the Neon p
 ```bash
 npx prisma migrate deploy
 ```
+
+### Password protection
+
+The app holds real client names, contacts, and payment data, so it's gated behind a single shared password. Set `APP_PASSWORD` in Vercel's environment variables (and in `.env` locally if you want the gate during development) — anyone without it is redirected to `/login`. If `APP_PASSWORD` is unset, the app is open with no gate.

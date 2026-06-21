@@ -4,6 +4,7 @@ import { waLink } from "@/app/lib/whatsapp";
 import { StatusBadge } from "./StatusBadge";
 import { PayBadge } from "./PayBadge";
 import { DeleteButton } from "./DeleteButton";
+import { SubmitButton } from "./SubmitButton";
 
 type DepositBalanceItem = {
   id: string;
@@ -85,14 +86,10 @@ export function DepositBalanceList<T extends DepositBalanceItem>({
 
           <div className="mt-3 flex flex-wrap gap-2">
             <form action={onToggleDeposit.bind(null, item.id, !item.depositPaid)}>
-              <button type="submit" className="btn-secondary">
-                Mark deposit {item.depositPaid ? "unpaid" : "paid"}
-              </button>
+              <SubmitButton>Mark deposit {item.depositPaid ? "unpaid" : "paid"}</SubmitButton>
             </form>
             <form action={onToggleBalance.bind(null, item.id, !item.balancePaid)}>
-              <button type="submit" className="btn-secondary">
-                Mark balance {item.balancePaid ? "unpaid" : "paid"}
-              </button>
+              <SubmitButton>Mark balance {item.balancePaid ? "unpaid" : "paid"}</SubmitButton>
             </form>
             <Link href={`${editBasePath}/${item.id}`} className="btn-secondary">
               Edit

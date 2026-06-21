@@ -1,30 +1,8 @@
-import Link from "next/link";
 import { prisma } from "@/app/lib/prisma";
-import { formatDate, formatMoney, isOverdue } from "@/app/lib/format";
-import { waLink } from "@/app/lib/whatsapp";
-import { StatusBadge } from "@/app/components/StatusBadge";
+import { formatMoney, isOverdue } from "@/app/lib/format";
+import { JobsExplorer, type JobRow } from "@/app/components/JobsExplorer";
 
 export const dynamic = "force-dynamic";
-
-type JobRow = {
-  id: string;
-  type: string;
-  typeLabel: string;
-  title: string;
-  clientName: string;
-  whatsappNumber: string;
-  deadline: Date | null;
-  status: string;
-  outstanding: number;
-  editPath: string;
-};
-
-const TYPE_STYLES: Record<string, { bar: string; badge: string }> = {
-  assignment: { bar: "border-l-violet-500", badge: "bg-violet-500/10 text-violet-300" },
-  research: { bar: "border-l-sky-500", badge: "bg-sky-500/10 text-sky-300" },
-  "care-study": { bar: "border-l-rose-500", badge: "bg-rose-500/10 text-rose-300" },
-  coding: { bar: "border-l-amber-500", badge: "bg-amber-500/10 text-amber-300" },
-};
 
 export default async function DashboardPage() {
   const [assignments, research, careStudies, coding] = await Promise.all([
@@ -120,58 +98,7 @@ export default async function DashboardPage() {
         />
       </div>
 
-      <div className="space-y-3">
-        {rows.length === 0 && (
-          <p className="card p-6 text-center text-sm text-slate-400">No jobs tracked yet.</p>
-        )}
-        {rows.map((row) => {
-          const overdue = isOverdue(row.deadline, row.status);
-          const style = TYPE_STYLES[row.type] ?? TYPE_STYLES.assignment;
-          return (
-            <div
-              key={`${row.type}-${row.id}`}
-              className={`card border-l-4 p-4 transition hover:shadow-md ${
-                overdue ? "border-l-rose-500 ring-1 ring-rose-900/40" : style.bar
-              }`}
-            >
-              <div className="flex flex-wrap items-start justify-between gap-2">
-                <div>
-                  <span
-                    className={`mb-1 inline-block rounded-full px-2.5 py-0.5 text-xs font-semibold ${style.badge}`}
-                  >
-                    {row.typeLabel}
-                  </span>
-                  <p className="font-semibold text-white">{row.title}</p>
-                  <p className="text-sm text-slate-400">{row.clientName}</p>
-                </div>
-                <StatusBadge status={row.status} />
-              </div>
-              <div className="mt-3 flex flex-wrap items-center gap-4 text-sm text-slate-400">
-                <span className={overdue ? "font-semibold text-rose-400" : ""}>
-                  Deadline: {formatDate(row.deadline)}
-                  {overdue ? " (overdue)" : ""}
-                </span>
-                {row.outstanding > 0 && (
-                  <span className="font-semibold text-amber-400">
-                    Owed: {formatMoney(row.outstanding)}
-                  </span>
-                )}
-                <a
-                  href={waLink(row.whatsappNumber)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="font-medium text-emerald-400 hover:underline"
-                >
-                  WhatsApp
-                </a>
-                <Link href={row.editPath} className="font-medium text-violet-400 hover:underline">
-                  Edit
-                </Link>
-              </div>
-            </div>
-          );
-        })}
-      </div>
+      <JobsExplorer rows={rows} />
     </div>
   );
 }
