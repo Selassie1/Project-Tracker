@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { prisma } from "@/app/lib/prisma";
 import { DepositBalanceForm } from "@/app/components/DepositBalanceForm";
+import { MilestoneSection } from "@/app/components/MilestoneSection";
 import { updateCareStudy } from "../actions";
 
 export default async function EditCareStudyPage({
@@ -9,7 +10,10 @@ export default async function EditCareStudyPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const study = await prisma.careStudy.findUnique({ where: { id } });
+  const study = await prisma.careStudy.findUnique({
+    where: { id },
+    include: { milestones: { orderBy: [{ dueDate: "asc" }, { order: "asc" }] } },
+  });
   if (!study) notFound();
 
   return (
@@ -22,6 +26,7 @@ export default async function EditCareStudyPage({
         initial={study}
         initialName={study.condition}
       />
+      <MilestoneSection parent="care-study" parentId={id} milestones={study.milestones} />
     </div>
   );
 }

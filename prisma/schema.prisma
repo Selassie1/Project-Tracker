@@ -48,6 +48,7 @@ model ResearchProject {
   deadline        DateTime?
   status          JobStatus @default(PENDING)
   notes           String?
+  milestones      Milestone[]
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
 }
@@ -68,8 +69,28 @@ model CareStudy {
   deadline        DateTime?
   status          JobStatus @default(PENDING)
   notes           String?
+  milestones      Milestone[]
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
+}
+
+// A section/chapter of a research project or care study with its own due date.
+// e.g. "Chapter 1" due Tuesday, "Sections 4-5" due next week.
+model Milestone {
+  id                String           @id @default(cuid())
+  title             String
+  dueDate           DateTime?
+  isDone            Boolean          @default(false)
+  doneAt            DateTime?
+  order             Int              @default(0)
+  researchProjectId String?
+  researchProject   ResearchProject? @relation(fields: [researchProjectId], references: [id], onDelete: Cascade)
+  careStudyId       String?
+  careStudy         CareStudy?       @relation(fields: [careStudyId], references: [id], onDelete: Cascade)
+  createdAt         DateTime         @default(now())
+
+  @@index([researchProjectId])
+  @@index([careStudyId])
 }
 
 // App/software builds: deposit at start, balance at completion.
