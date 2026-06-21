@@ -20,10 +20,10 @@ type JobRow = {
 };
 
 const TYPE_STYLES: Record<string, { bar: string; badge: string }> = {
-  assignment: { bar: "border-l-violet-500", badge: "bg-violet-100 text-violet-700" },
-  research: { bar: "border-l-sky-500", badge: "bg-sky-100 text-sky-700" },
-  "care-study": { bar: "border-l-rose-500", badge: "bg-rose-100 text-rose-700" },
-  coding: { bar: "border-l-amber-500", badge: "bg-amber-100 text-amber-700" },
+  assignment: { bar: "border-l-violet-500", badge: "bg-violet-500/10 text-violet-300" },
+  research: { bar: "border-l-sky-500", badge: "bg-sky-500/10 text-sky-300" },
+  "care-study": { bar: "border-l-rose-500", badge: "bg-rose-500/10 text-rose-300" },
+  coding: { bar: "border-l-amber-500", badge: "bg-amber-500/10 text-amber-300" },
 };
 
 export default async function DashboardPage() {
@@ -98,8 +98,8 @@ export default async function DashboardPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-slate-900">Dashboard</h1>
-        <p className="text-sm text-slate-500">Everything you&apos;re working on, in one place.</p>
+        <h1 className="text-2xl font-bold text-white">Dashboard</h1>
+        <p className="text-sm text-slate-400">Everything you&apos;re working on, in one place.</p>
       </div>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
@@ -122,7 +122,7 @@ export default async function DashboardPage() {
 
       <div className="space-y-3">
         {rows.length === 0 && (
-          <p className="card p-6 text-center text-sm text-slate-500">No jobs tracked yet.</p>
+          <p className="card p-6 text-center text-sm text-slate-400">No jobs tracked yet.</p>
         )}
         {rows.map((row) => {
           const overdue = isOverdue(row.deadline, row.status);
@@ -131,7 +131,7 @@ export default async function DashboardPage() {
             <div
               key={`${row.type}-${row.id}`}
               className={`card border-l-4 p-4 transition hover:shadow-md ${
-                overdue ? "border-l-rose-500 ring-1 ring-rose-200" : style.bar
+                overdue ? "border-l-rose-500 ring-1 ring-rose-900/40" : style.bar
               }`}
             >
               <div className="flex flex-wrap items-start justify-between gap-2">
@@ -141,18 +141,18 @@ export default async function DashboardPage() {
                   >
                     {row.typeLabel}
                   </span>
-                  <p className="font-semibold text-slate-900">{row.title}</p>
-                  <p className="text-sm text-slate-500">{row.clientName}</p>
+                  <p className="font-semibold text-white">{row.title}</p>
+                  <p className="text-sm text-slate-400">{row.clientName}</p>
                 </div>
                 <StatusBadge status={row.status} />
               </div>
-              <div className="mt-3 flex flex-wrap items-center gap-4 text-sm text-slate-600">
-                <span className={overdue ? "font-semibold text-rose-600" : ""}>
+              <div className="mt-3 flex flex-wrap items-center gap-4 text-sm text-slate-400">
+                <span className={overdue ? "font-semibold text-rose-400" : ""}>
                   Deadline: {formatDate(row.deadline)}
                   {overdue ? " (overdue)" : ""}
                 </span>
                 {row.outstanding > 0 && (
-                  <span className="font-semibold text-amber-600">
+                  <span className="font-semibold text-amber-400">
                     Owed: {formatMoney(row.outstanding)}
                   </span>
                 )}
@@ -160,11 +160,11 @@ export default async function DashboardPage() {
                   href={waLink(row.whatsappNumber)}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="font-medium text-emerald-600 hover:underline"
+                  className="font-medium text-emerald-400 hover:underline"
                 >
                   WhatsApp
                 </a>
-                <Link href={row.editPath} className="font-medium text-violet-600 hover:underline">
+                <Link href={row.editPath} className="font-medium text-violet-400 hover:underline">
                   Edit
                 </Link>
               </div>

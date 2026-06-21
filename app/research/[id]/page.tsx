@@ -14,7 +14,7 @@ export default async function EditResearchProjectPage({
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-slate-900">Edit research project</h1>
+      <h1 className="text-2xl font-bold text-white">Edit research project</h1>
       <DepositBalanceForm
         action={updateResearchProject.bind(null, id)}
         nameField="topic"

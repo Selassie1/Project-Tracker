@@ -1,7 +1,7 @@
 const STATUS_STYLES: Record<string, string> = {
-  PENDING: "bg-slate-100 text-slate-700 ring-1 ring-slate-300",
-  IN_PROGRESS: "bg-sky-100 text-sky-700 ring-1 ring-sky-300",
-  COMPLETED: "bg-emerald-100 text-emerald-700 ring-1 ring-emerald-300",
+  PENDING: "bg-slate-500/10 text-slate-300 ring-1 ring-slate-500/30",
+  IN_PROGRESS: "bg-sky-500/10 text-sky-300 ring-1 ring-sky-500/30",
+  COMPLETED: "bg-emerald-500/10 text-emerald-300 ring-1 ring-emerald-500/30",
 };
 
 const STATUS_DOT: Record<string, string> = {
